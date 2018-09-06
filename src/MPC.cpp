@@ -20,6 +20,17 @@ double dt = 0.05; // TODO
 //
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
+double ref_v = 40; // The reference velocity is set to 40 mph.
+
+// start Points are in Relation to N
+size_t x_start = 0;
+size_t y_start = 1 * N;
+size_t psi_start = 2 * N;
+size_t v_start = 3 * N;
+size_t cte_start = 4 * N;
+size_t epsi_start = 5 * N;
+size_t delta_start = 6 * N;
+size_t a_start = 7 * N - 1;
 
 class FG_eval {
  public:
@@ -33,16 +44,6 @@ class FG_eval {
     // `fg` a vector of the cost constraints, `vars` is a vector of variable values (state & actuators)
     // NOTE: You'll probably go back and forth between this function and
     // the Solver function below.
-   
-    // start Points are in Relation to N
-    size_t x_start = 0;
-    size_t y_start = 1 * N;
-    size_t psi_start = 2 * N;
-    size_t v_start = 3 * N;
-    size_t cte_start = 4 * N;
-    size_t epsi_start = 5 * N;
-    size_t delta_start = 6 * N;
-    size_t a_start = 7 * N - 1;
    
     // Begin ####################################################################
     // The cost is stored is the first element of `fg`.
