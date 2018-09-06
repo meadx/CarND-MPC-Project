@@ -104,14 +104,14 @@ int main() {
           // Begin ##############################################################################
           
           // calculate coeffs
-          pst_size = pstx.size();
-          for (int i = 0; i < pst_size; i++) {
-            pstx[i] = (pstxi[i]-px) * cos(psi) + (pstyi[i]-py) * sin(psi);
-            psty[i] = (pstyi[i]-py) * cos(psi) - (pstxi[i]-px) * sin(psi);
+          int pts_size = ptsx.size();
+          for (int i = 0; i < pts_size; i++) {
+            ptsx[i] = (ptsx[i]-px) * cos(psi) + (ptsy[i]-py) * sin(psi);
+            ptsy[i] = (ptsy[i]-py) * cos(psi) - (ptsx[i]-px) * sin(psi);
           }
-          Eigen::VectorXd ptsx_e = Eigen::VectorXd::Map(ptsx.data(), pst_size); // source: https://forum.kde.org/viewtopic.php?f=74&t=94839
-          Eigen::VectorXd ptsy_e = Eigen::VectorXd::Map(ptsy.data(), pst_size);
-          auto coeffs = polyfit(ptsx, ptsy, 3);
+          Eigen::VectorXd ptsx_e = Eigen::VectorXd::Map(ptsx.data(), pts_size); // source: https://forum.kde.org/viewtopic.php?f=74&t=94839
+          Eigen::VectorXd ptsy_e = Eigen::VectorXd::Map(ptsy.data(), pts_size);
+          auto coeffs = polyfit(ptsx_e, ptsy_e, 3);
           
           // calculate next_state
           Eigen::VectorXd next_state(6);
