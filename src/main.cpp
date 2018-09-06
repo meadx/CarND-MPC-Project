@@ -100,6 +100,35 @@ int main() {
           */
           double steer_value;
           double throttle_value;
+          
+          // Begin ##############################################################################
+          
+          // calculate coeffs
+          // ToDo: Transformation?
+          auto coeffs = polyfit(ptsx, ptsy, 3);
+          
+          // calculate next_state
+          Eigen::VectorXd next_state(6);
+          double dt = 0.05; // TODO Value from MPC.cpp
+          const double Lf = 2.67; //  Value from MPC.cpp
+          steer_value = j[1]["steering_angle"];
+          throttle_value = j[1]["throttle"];
+          double cte = polyeval(coeffs, px) - py; // Source: https://github.com/udacity/CarND-MPC-Quizzes/blob/master/mpc_to_line/solution/MPC.cpp
+          double epsi = psi - atan(coeffs[1]);
+          
+          next_state[0] = px + v * cos(psi) * dt; // x
+          next_state[1] = py + v * sin(psi)  *dt; // y
+          next_state[2] = psi + v / Lf * steer_value * dt; // psi
+          next_state[3] = v + throttle_value * dt; // v
+          next_state[4] = cte; // cte
+          next_state[5] = epsi; // epsi          
+          
+          // Get steering and throttle values from MPC Solve
+          auto solve = mpc.Solve(next_state, coeffs);
+          steer_value = solve[6];
+          throttle_value = solve[7];
+          
+          // End ################################################################################
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
