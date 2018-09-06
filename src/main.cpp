@@ -104,7 +104,13 @@ int main() {
           // Begin ##############################################################################
           
           // calculate coeffs
-          // ToDo: Transformation?
+          pst_size = pstx.size();
+          for (int i = 0; i < pst_size; i++) {
+            pstx[i] = (pstxi[i]-px) * cos(psi) + (pstyi[i]-py) * sin(psi);
+            psty[i] = (pstyi[i]-py) * cos(psi) - (pstxi[i]-px) * sin(psi);
+          }
+          Eigen::VectorXd ptsx_e = Eigen::VectorXd::Map(ptsx.data(), pst_size); // source: https://forum.kde.org/viewtopic.php?f=74&t=94839
+          Eigen::VectorXd ptsy_e = Eigen::VectorXd::Map(ptsy.data(), pst_size);
           auto coeffs = polyfit(ptsx, ptsy, 3);
           
           // calculate next_state
