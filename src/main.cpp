@@ -119,20 +119,22 @@ int main() {
           const double Lf = 2.67; //  Value from MPC.cpp
           steer_value = j[1]["steering_angle"];
           throttle_value = j[1]["throttle"];
-          double cte = polyeval(coeffs, px) - py; // Source: https://github.com/udacity/CarND-MPC-Quizzes/blob/master/mpc_to_line/solution/MPC.cpp
-          double epsi = psi - atan(coeffs[1]);
+          double cte = polyeval(coeffs, 0);
+          //double cte = polyeval(coeffs, px) - py; // Source: https://github.com/udacity/CarND-MPC-Quizzes/blob/master/mpc_to_line/solution/MPC.cpp
+          double epsi = - atan(coeffs[1]);
+          // double epsi = psi - atan(coeffs[1]);
           
-          next_state[0] = px + v * cos(psi) * dt; // x
-          next_state[1] = py + v * sin(psi)  *dt; // y
-          next_state[2] = psi + v / Lf * steer_value * dt; // psi
+          next_state[0] = v * cos(psi) * dt; // x
+          next_state[1] = v * sin(psi)  *dt; // y
+          next_state[2] = - v / Lf * steer_value * dt; // psi
           next_state[3] = v + throttle_value * dt; // v
-          next_state[4] = cte; // cte
-          next_state[5] = epsi; // epsi          
+          next_state[4] = cte + v * sin(epsi) * dt; // cte TODO Check calculation
+          next_state[5] = epsi - v * throttle_value / Lf * dt; // epsi TODO Check Calculation
           
           // Get steering and throttle values from MPC Solve
           auto solve = mpc.Solve(next_state, coeffs);
-          steer_value = solve[6];
-          throttle_value = solve[7];
+          steer_value = solve[0] / (deg2rad(25)*Lf);
+          throttle_value = solve[1];
           
           // End ################################################################################
 
@@ -148,6 +150,10 @@ int main() {
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
+	  /*for (int i=0; i<solve.size(); i=i+8) {
+	     mpc_x_vals.push_back(solve[i]);
+             mpc_y_vals.push_back(solve[i+1]);
+	  }*/
 
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
