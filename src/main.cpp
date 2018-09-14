@@ -93,15 +93,13 @@ int main() {
           double v = j[1]["speed"];
 
           /*
-          * TODO: Calculate steering angle and throttle using MPC.
+          * Calculate steering angle and throttle using MPC.
           *
           * Both are in between [-1, 1].
           *
           */
           double steer_value;
           double throttle_value;
-          
-          // Begin ##############################################################################
           
           // calculate coeffs
           int pts_size = ptsx.size();
@@ -117,29 +115,21 @@ int main() {
           
           // calculate next_state
           Eigen::VectorXd next_state(6);
-          //double dt = 0.05; // TODO Value from MPC.cpp
-          //const double Lf = 2.67; //  Value from MPC.cpp
-          //steer_value = j[1]["steering_angle"];
-          //throttle_value = j[1]["throttle"];
           double cte = polyeval(coeffs, 0);
-          //double cte = polyeval(coeffs, px) - py; // Source: https://github.com/udacity/CarND-MPC-Quizzes/blob/master/mpc_to_line/solution/MPC.cpp
           double epsi = - atan(coeffs[1]);
-          // double epsi = psi - atan(coeffs[1]);
           
           next_state[0] = 0; // x
           next_state[1] = 0; // y
           next_state[2] = 0; // psi
           next_state[3] = v; // v
-          next_state[4] = cte; // cte TODO Check calculation
-          next_state[5] = epsi; // epsi TODO Check Calculation
+          next_state[4] = cte; // cte 
+          next_state[5] = epsi; // epsi 
           
           // Get steering and throttle values from MPC Solve
           auto solve = mpc.Solve(next_state, coeffs);
           steer_value = -solve[0] / deg2rad(25);
           throttle_value = solve[1];
           
-          // End ################################################################################
-
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
