@@ -165,6 +165,13 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   for (int i = 0; i < n_vars; i++) {
     vars[i] = 0;
   }
+  vars[x_start] = state[0];
+  vars[y_start] = state[1];
+  vars[psi_start] = state[2];
+  vars[v_start] = state[3];
+  vars[cte_start] = state[4];
+  vars[epsi_start] = state[5];
+
 
   Dvector vars_lowerbound(n_vars);
   Dvector vars_upperbound(n_vars);
@@ -243,5 +250,13 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // {...} is shorthand for creating a vector, so auto x1 = {1.0,2.0}
   // creates a 2 element double vector.
   // Source: https://github.com/udacity/CarND-MPC-Quizzes/blob/master/mpc_to_line/solution/MPC.cpp
-  return {solution.x[delta_start],   solution.x[a_start]};
+  //return {solution.x[delta_start], solution.x[a_start]};
+  vector<double> ret;
+  ret.push_back(solution.x[delta_start]);
+  ret.push_back(solution.x[a_start]);
+  for (int i = 0; i < N-1; i++); {
+     ret.push_back(solution.x[x_start+i]);
+     ret.push_back(solution.x[y_start+i]);
+  }
+  return ret;
 }

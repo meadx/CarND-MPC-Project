@@ -109,33 +109,33 @@ int main() {
           Eigen::VectorXd ptsy_e(pts_size);
           
           for (int i = 0; i < pts_size; i++) {
-            ptsx_e[i] = (ptsx[i]-px) * cos(-psi) + (ptsy[i]-py) * sin(-psi);
-            ptsy_e[i] = (ptsy[i]-py) * cos(-psi) - (ptsx[i]-px) * sin(-psi);
+            ptsx_e[i] = (ptsx[i]-px) * cos(psi) + (ptsy[i]-py) * sin(psi);
+            ptsy_e[i] = (ptsy[i]-py) * cos(psi) - (ptsx[i]-px) * sin(psi);
           }
           
           auto coeffs = polyfit(ptsx_e, ptsy_e, 3);
           
           // calculate next_state
           Eigen::VectorXd next_state(6);
-          double dt = 0.05; // TODO Value from MPC.cpp
-          const double Lf = 2.67; //  Value from MPC.cpp
-          steer_value = j[1]["steering_angle"];
-          throttle_value = j[1]["throttle"];
+          //double dt = 0.05; // TODO Value from MPC.cpp
+          //const double Lf = 2.67; //  Value from MPC.cpp
+          //steer_value = j[1]["steering_angle"];
+          //throttle_value = j[1]["throttle"];
           double cte = polyeval(coeffs, 0);
           //double cte = polyeval(coeffs, px) - py; // Source: https://github.com/udacity/CarND-MPC-Quizzes/blob/master/mpc_to_line/solution/MPC.cpp
           double epsi = - atan(coeffs[1]);
           // double epsi = psi - atan(coeffs[1]);
           
-          next_state[0] = v * cos(psi) * dt; // x
-          next_state[1] = v * sin(psi)  *dt; // y
-          next_state[2] = - v / Lf * steer_value * dt; // psi
-          next_state[3] = v + throttle_value * dt; // v
-          next_state[4] = cte + v * sin(epsi) * dt; // cte TODO Check calculation
-          next_state[5] = epsi - v * throttle_value / Lf * dt; // epsi TODO Check Calculation
+          next_state[0] = 0; // x
+          next_state[1] = 0; // y
+          next_state[2] = 0; // psi
+          next_state[3] = v; // v
+          next_state[4] = cte; // cte TODO Check calculation
+          next_state[5] = epsi; // epsi TODO Check Calculation
           
           // Get steering and throttle values from MPC Solve
           auto solve = mpc.Solve(next_state, coeffs);
-          steer_value = solve[0] / (deg2rad(25)*Lf);
+          steer_value = -solve[0] / deg2rad(25);
           throttle_value = solve[1];
           
           // End ################################################################################
@@ -152,10 +152,10 @@ int main() {
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
-	  /*for (int i=0; i<solve.size(); i=i+8) {
-	     mpc_x_vals.push_back(solve[i]);
-             mpc_y_vals.push_back(solve[i+1]);
-	  }*/
+	  for (int i=1; i<solve.size()/2; i++) {
+	     mpc_x_vals.push_back(solve[2*i]);
+             mpc_y_vals.push_back(solve[2*i+1]);
+	  }
 
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
@@ -166,6 +166,11 @@ int main() {
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
+          for (int i=2; i<pts_size; i++) {
+             next_x_vals.push_back(ptsx_e[i]);
+             next_y_vals.push_back(ptsy_e[i]);
+          }
+	         
 
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
