@@ -6,8 +6,8 @@
 using CppAD::AD;
 
 // TODO: Set the timestep length and duration
-size_t N = 25; // TODO
-double dt = 0.05; // TODO
+size_t N  = 15; // TODO
+double dt = 0.1; // TODO
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -76,7 +76,7 @@ class FG_eval {
     fg[1 + v_start] = vars[v_start];
     fg[1 + cte_start] = vars[cte_start];
     fg[1 + epsi_start] = vars[epsi_start];
-    
+   /* 
     for (int t = 1; t < N ; t++) {
       // psi, v, delta at time t
       AD<double> psi0 = vars[psi_start + t - 1];
@@ -88,7 +88,7 @@ class FG_eval {
 
       // how psi changes
       fg[1 + psi_start + t] = psi1 - (psi0 + v0 * delta0 / Lf * dt);
-    }
+    }*/
    
     for (int t = 1; t < N; t++) {
        // The state at time t+1 .
@@ -208,6 +208,26 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     constraints_upperbound[i] = 0;
   }
 
+  // Constraints
+  constraints_lowerbound[x_start] = state[0];
+  constraints_upperbound[x_start] = state[0];
+
+  constraints_lowerbound[y_start] = state[1];
+  constraints_upperbound[y_start] = state[1];
+
+  constraints_lowerbound[psi_start] = state[2];
+  constraints_upperbound[psi_start] = state[2];
+
+  constraints_lowerbound[v_start] = state[3];
+  constraints_upperbound[v_start] = state[3];
+
+  constraints_lowerbound[cte_start] = state[4];
+  constraints_upperbound[cte_start] = state[4];
+
+  constraints_lowerbound[epsi_start] = state[5];
+  constraints_upperbound[epsi_start] = state[5];
+  
+
   // object that computes objective and constraints
   FG_eval fg_eval(coeffs);
 
@@ -254,7 +274,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   vector<double> ret;
   ret.push_back(solution.x[delta_start]);
   ret.push_back(solution.x[a_start]);
-  for (int i = 0; i < N-1; i++); {
+  for (int i = 0; i < N-1; i++) {
      ret.push_back(solution.x[x_start+i]);
      ret.push_back(solution.x[y_start+i]);
   }
