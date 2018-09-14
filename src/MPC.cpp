@@ -5,9 +5,9 @@
 
 using CppAD::AD;
 
-// TODO: Set the timestep length and duration
-size_t N  = 10; // TODO
-double dt = 0.1; // TODO
+// Set the timestep length and duration
+size_t N  = 10;
+double dt = 0.1;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -69,26 +69,12 @@ class FG_eval {
       fg[0] += CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
      
-    // ##########################################################################
     fg[1 + x_start] = vars[x_start];
     fg[1 + y_start] = vars[y_start];
     fg[1 + psi_start] = vars[psi_start];
     fg[1 + v_start] = vars[v_start];
     fg[1 + cte_start] = vars[cte_start];
     fg[1 + epsi_start] = vars[epsi_start];
-   /* 
-    for (int t = 1; t < N ; t++) {
-      // psi, v, delta at time t
-      AD<double> psi0 = vars[psi_start + t - 1];
-      AD<double> v0 = vars[v_start + t - 1];
-      AD<double> delta0 = vars[delta_start + t - 1];
-
-      // psi at time t+1
-      AD<double> psi1 = vars[psi_start + t];
-
-      // how psi changes
-      fg[1 + psi_start + t] = psi1 - (psi0 + v0 * delta0 / Lf * dt);
-    }*/
    
     for (auto t = 1; t < N; t++) {
        // The state at time t+1 .
@@ -111,7 +97,7 @@ class FG_eval {
        AD<double> delta0 = vars[delta_start + t - 1];
        AD<double> a0 = vars[a_start + t - 1];
 
-       AD<double> f0 = coeffs[0] + coeffs[1]*x0 + coeffs[2]*x0*x0 + coeffs[3]*x0*x0*x0; // TODO Check
+       AD<double> f0 = coeffs[0] + coeffs[1]*x0 + coeffs[2]*x0*x0 + coeffs[3]*x0*x0*x0;
        AD<double> psides0 = CppAD::atan(coeffs[1] + 2*coeffs[2]*x0 + 3*coeffs[3]*x0*x0 );
 
        // Here's `x` to get you started.
@@ -132,9 +118,7 @@ class FG_eval {
            cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
        fg[1 + epsi_start + t] =
            epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt);
-}
-   
-    // End ######################################################################
+     }
    
   }
 };
@@ -150,14 +134,14 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   size_t i;
   typedef CPPAD_TESTVECTOR(double) Dvector;
 
-  // TODO: Set the number of model variables (includes both states and inputs).
+  // Set the number of model variables (includes both states and inputs).
   // For example: If the state is a 4 element vector, the actuators is a 2
   // element vector and there are 10 timesteps. The number of variables is:
   //
   // 4 * 10 + 2 * 9
-  size_t n_vars = 6 * N + 2 * (N-1); // TODO
-  // TODO: Set the number of constraints
-  size_t n_constraints = 6 * N; // TODO
+  size_t n_vars = 6 * N + 2 * (N-1);
+  // Set the number of constraints
+  size_t n_constraints = 6 * N;
 
   // Initial value of the independent variables.
   // SHOULD BE 0 besides initial state.
