@@ -117,13 +117,17 @@ int main() {
           Eigen::VectorXd next_state(6);
           double cte = polyeval(coeffs, 0);
           double epsi = - atan(coeffs[1]);
-          
-          next_state[0] = 0; // x
-          next_state[1] = 0; // y
-          next_state[2] = 0; // psi
-          next_state[3] = v; // v
-          next_state[4] = cte; // cte 
-          next_state[5] = epsi; // epsi 
+          double dt = 0.1;
+          const double Lf = 2.67; //  Value from MPC.cpp
+          steer_value = j[1]["steering_angle"];
+          throttle_value = j[1]["throttle"];
+
+          next_state[0] = v * cos(epsi) * dt;; // x
+          next_state[1] = v * sin(epsi) * dt; // y
+          next_state[2] = - v / Lf * steer_value * dt; // psi
+          next_state[3] = v + throttle_value * dt; // v
+          next_state[4] = cte + v * sin(epsi) * dt; // cte
+          next_state[5] = epsi - v * throttle_value / Lf * dt; // epsi
           
           // Get steering and throttle values from MPC Solve
           auto solve = mpc.Solve(next_state, coeffs);
